@@ -3,6 +3,7 @@ import { Session, User } from '@domain/entities';
 import type { SessionsRepository, UsersRepository } from '@domain/repositories';
 import { encrypt } from '@infrastructure/crypto';
 import type { UseCaseDependencies } from '@infrastructure/di';
+import type { APIUser, RESTPostOAuth2AccessTokenResult } from 'discord-api-types/v10';
 import { z } from 'zod';
 
 const paramsSchema = z.object({
@@ -15,19 +16,6 @@ export type HandleDiscordCallbackResult =
   | { type: 'success'; sessionId: string }
   | { type: 'error' }
   | { type: 'invalid_code' };
-
-interface DiscordTokenResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  expires_in: number;
-}
-
-interface DiscordUserResponse {
-  id: string;
-  username: string;
-  avatar: string | null;
-}
 
 export async function handleDiscordCallback(
   params: HandleDiscordCallbackParams,
@@ -61,7 +49,7 @@ export async function handleDiscordCallback(
     id: randomUUID(),
     discordId: discordUser.id,
     username: discordUser.username,
-    avatar: discordUser.avatar,
+    avatar: discordUser.avatar ?? null,
     accessToken: encrypt(tokenResponse.access_token),
     refreshToken: encrypt(tokenResponse.refresh_token),
     createdAt: new Date(),
@@ -99,7 +87,7 @@ async function exchangeCodeForToken(
   config: {
     discord: { clientId: string; clientSecret: string; redirectUri: string };
   },
-): Promise<DiscordTokenResponse | null> {
+): Promise<RESTPostOAuth2AccessTokenResult | null> {
   const params = new URLSearchParams({
     client_id: config.discord.clientId,
     client_secret: config.discord.clientSecret,
@@ -121,13 +109,13 @@ async function exchangeCodeForToken(
       return null;
     }
 
-    return response.json() as Promise<DiscordTokenResponse>;
+    return response.json() as Promise<RESTPostOAuth2AccessTokenResult>;
   } catch {
     return null;
   }
 }
 
-async function fetchDiscordUser(accessToken: string): Promise<DiscordUserResponse | null> {
+async function fetchDiscordUser(accessToken: string): Promise<APIUser | null> {
   try {
     const response = await fetch('https://discord.com/api/users/@me', {
       headers: {
@@ -139,7 +127,7 @@ async function fetchDiscordUser(accessToken: string): Promise<DiscordUserRespons
       return null;
     }
 
-    return response.json() as Promise<DiscordUserResponse>;
+    return response.json() as Promise<APIUser>;
   } catch {
     return null;
   }

@@ -1,16 +1,10 @@
 import type { SessionsRepository, UsersRepository } from '@domain/repositories';
 import { decrypt, encrypt } from '@infrastructure/crypto';
 import type { UseCaseDependencies } from '@infrastructure/di';
+import type { RESTPostOAuth2AccessTokenResult } from 'discord-api-types/v10';
 
 export type RefreshTokenParams = { sessionId: string };
 export type RefreshTokenResult = { type: 'success' } | { type: 'error' } | { type: 'not_found' };
-
-interface DiscordTokenResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  expires_in: number;
-}
 
 export async function refreshToken(
   params: RefreshTokenParams,
@@ -81,7 +75,7 @@ async function refreshDiscordToken(
   clientId: string,
   clientSecret: string,
   redirectUri: string,
-): Promise<DiscordTokenResponse | null> {
+): Promise<RESTPostOAuth2AccessTokenResult | null> {
   const params = new URLSearchParams({
     client_id: clientId,
     client_secret: clientSecret,
@@ -103,7 +97,7 @@ async function refreshDiscordToken(
       return null;
     }
 
-    return response.json() as Promise<DiscordTokenResponse>;
+    return response.json() as Promise<RESTPostOAuth2AccessTokenResult>;
   } catch {
     return null;
   }
