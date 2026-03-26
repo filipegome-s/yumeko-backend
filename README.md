@@ -1,132 +1,333 @@
 # Yumeko Backend
 
-Backend de autenticação com Discord OAuth, construído com Fastify, Drizzle ORM e MySQL.
+<div align="center">
 
-## Stack
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-24+-green?logo=node.js&logoColor=white)
+![Fastify](https://img.shields.io/badge/Fastify-5.6-black?logo=fastify&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8-orange?logo=mysql&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-4.0-yellow?logo=vitest&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-- **Runtime**: Node.js 24+
-- **Framework**: Fastify 5
-- **ORM**: Drizzle ORM
-- **Banco**: MySQL 
-- **Validação**: Zod
-- **Testes**: Vitest
+Backend de autenticação OAuth com Discord, seguindo os princípios de **Clean Architecture**.
 
-## Quick Start
+</div>
 
-### 1. Configurar variáveis de ambiente
+---
+
+## 📋 Índice
+
+- [Sobre](#-sobre)
+- [Tecnologias](#-tecnologias)
+- [Começando](#-começando)
+- [Scripts](#-scripts)
+- [API Reference](#-api-reference)
+- [Variáveis de Ambiente](#-variáveis-de-ambiente)
+- [Arquitetura](#-arquitetura)
+- [Segurança](#-segurança)
+- [Desenvolvimento](#-desenvolvimento)
+
+---
+
+## 📖 Sobre
+
+Sistema de autenticação via Discord OAuth 2.0, permitindo que usuários façam login com suas contas do Discord. Implementa:
+- OAuth flow completo com Discord
+- Sessões persistentes com cookies seguros
+- Renovação automática de tokens
+- Criptografia de tokens no banco de dados
+- Arquitetura limpa e escalável
+
+---
+
+## 🚀 Tecnologias
+
+| Tecnologia | Versão | Uso |
+|-----------|--------|-----|
+| Node.js | 24+ | Runtime |
+| Fastify | 5.x | Framework HTTP |
+| Drizzle ORM | 0.45+ | ORM |
+| MySQL | 8.x | Banco de dados |
+| Zod | 4.x | Validação |
+| Vitest | 4.x | Testes |
+| TypeScript | 5.9+ | Linguagem |
+
+---
+
+## 🏃 Começando
+
+### Pré-requisitos
+
+- Node.js 24+
+- MySQL 8+
+- npm ou pnpm
+
+### Instalação
 
 ```bash
+# Clonar repositório
+git clone <repo-url>
+cd yumeko-backend
+
+# Instalar dependências
+npm install
+
+# Configurar variáveis de ambiente
 cp .env.example .env
 # Edite o .env com suas credenciais
 ```
 
-### 2. Instalar dependências
+### Configuração do Banco
 
 ```bash
-npm install
-```
+# Criar banco de dados
+mysql -u root -p -e "CREATE DATABASE yumeko;"
 
-### 3. Criar banco de dados
-
-```sql
-CREATE DATABASE yumeko;
-```
-
-### 4. Gerar e aplicar migrations
-
-```bash
+# Gerar e aplicar migrations
 npm run db:generate
 npm run db:migrate
 ```
 
-### 5. Rodar em desenvolvimento
+### Execução
 
 ```bash
+# Desenvolvimento
 npm run dev
-```
 
-### 6. Rodar em produção (Docker)
+# Produção
+npm run build
+npm start
 
-```bash
+# Docker
 docker-compose up -d
 ```
 
-## Scripts
+---
 
-| Comando | Descrição |
-|---------|-----------|
-| `npm run dev` | Rodar em desenvolvimento |
-| `npm run build` | Build de produção |
-| `npm run start` | Rodar em produção |
+## 📜 Scripts
+
+| Script | Descrição |
+|--------|-----------|
+| `npm run dev` | Iniciar servidor em desenvolvimento com hot-reload |
+| `npm run build` | Compilar TypeScript para JavaScript |
+| `npm run start` | Iniciar servidor em produção |
 | `npm run lint` | Verificar lint e tipos |
-| `npm run lint:fix` | Corrigir problemas de lint |
-| `npm run test` | Rodar todos os testes |
-| `npm run test:unit` | Rodar testes unitários |
-| `npm run db:generate` | Gerar migrations |
-| `npm run db:migrate` | Aplicar migrations |
-| `npm run db:studio` | Abrir Drizzle Studio |
+| `npm run lint:fix` | Corrigir problemas de lint automaticamente |
+| `npm run test` | Executar todos os testes |
+| `npm run test:watch` | Executar testes em modo watch |
+| `npm run db:generate` | Gerar arquivos de migration |
+| `npm run db:migrate` | Aplicar migrations no banco |
+| `npm run db:studio` | Abrir interface gráfica do banco |
 
-## API Endpoints
+---
+
+## 🔌 API Reference
 
 ### Autenticação
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/api/v1/auth/discord` | Obter URL de autorização Discord |
-| GET | `/api/v1/auth/discord/callback` | Callback OAuth |
-| POST | `/api/v1/auth/logout` | Logout |
-| POST | `/api/v1/auth/logout-all` | Logout de todos dispositivos |
-| POST | `/api/v1/auth/refresh` | Renovar token Discord |
-| GET | `/api/v1/auth/me` | Usuario atual |
+#### `GET /api/v1/auth/discord`
+Retorna a URL de autorização do Discord.
+
+**Resposta:**
+```json
+{
+  "url": "https://discord.com/api/oauth2/authorize?..."
+}
+```
+
+#### `GET /api/v1/auth/discord/callback`
+Callback do OAuth. Cria sessão e redireciona.
+
+**Query Parameters:**
+- `code` (obrigatório): Código de autorização
+
+#### `POST /api/v1/auth/logout`
+Encerra a sessão atual.
+
+**Resposta:**
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+#### `POST /api/v1/auth/logout-all`
+Encerra todas as sessões do usuário.
+
+**Resposta:**
+```json
+{
+  "message": "Logged out from all devices"
+}
+```
+
+#### `POST /api/v1/auth/refresh`
+Renova o token de acesso do Discord.
+
+**Resposta:**
+```json
+{
+  "message": "Token refreshed"
+}
+```
+
+#### `GET /api/v1/auth/me`
+Retorna informações do usuário autenticado.
+
+**Resposta:**
+```json
+{
+  "id": "uuid",
+  "username": "username",
+  "avatar": "avatar_hash"
+}
+```
+
+---
 
 ### Health Checks
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/health` | Liveness probe |
-| GET | `/ready` | Readiness probe |
+#### `GET /health`
+Liveness probe para Kubernetes.
 
-## Variáveis de Ambiente
+**Resposta:**
+```json
+{
+  "status": "ok"
+}
+```
 
-| Variável | Descrição |
-|----------|-----------|
-| `DATABASE_URL` | Connection string MySQL |
-| `DISCORD_CLIENT_ID` | Client ID do Discord |
-| `DISCORD_CLIENT_SECRET` | Client Secret do Discord |
-| `DISCORD_REDIRECT_URI` | URI de callback |
-| `SESSION_SECRET` | Secret para sessões (min 32 chars) |
-| `ENCRYPTION_KEY` | Chave AES-256 (min 32 chars) |
-| `PORT` | Porta do servidor |
-| `NODE_ENV` | ambiente (development/production) |
+#### `GET /ready`
+Readiness probe - verifica conexão com banco.
 
-## Arquitetura
+**Resposta (200):**
+```json
+{
+  "status": "ok"
+}
+```
+
+**Resposta (503):**
+```json
+{
+  "status": "error",
+  "error": "Database unavailable"
+}
+```
+
+---
+
+## 🔐 Variáveis de Ambiente
+
+| Variável | Obrigatório | Descrição |
+|----------|-------------|-----------|
+| `DATABASE_URL` | ✅ | Connection string MySQL |
+| `DISCORD_CLIENT_ID` | ✅ | Client ID da aplicação Discord |
+| `DISCORD_CLIENT_SECRET` | ✅ | Client Secret da aplicação Discord |
+| `DISCORD_REDIRECT_URI` | ✅ | URI de callback OAuth |
+| `ENCRYPTION_KEY` | ✅ | Chave AES-256 (32+ caracteres) |
+| `SESSION_SECRET` | ✅ | Secret para sessões (32+ caracteres) |
+| `PORT` | ❌ | Porta do servidor (padrão: 3000) |
+| `NODE_ENV` | ❌ | Ambiente: development/production |
+| `CORS_ORIGIN` | ❌ | Origens CORS permitidas |
+| `LOG_LEVEL` | ❌ | Nível de log (padrão: info) |
+
+---
+
+## 🏗️ Arquitetura
 
 ```
 src/
 ├── domain/
-│   ├── entities/      # Entidades de domínio
-│   └── repositories/  # Interfaces de repositórios
+│   ├── entities/          # Entidades de domínio
+│   │   ├── session.ts
+│   │   └── user.ts
+│   └── repositories/      # Interfaces dos repositórios
+│       ├── sessions-repository.ts
+│       └── users-repository.ts
+│
 ├── features/
-│   └── auth/          # Feature de autenticação
+│   └── auth/              # Feature de autenticação
 │       ├── auth-controller.ts
-│       ├── handle-discord-callback.ts
 │       ├── get-current-user.ts
 │       ├── get-discord-auth-url.ts
-│       ├── logout.ts
+│       ├── handle-discord-callback.ts
 │       ├── logout-all.ts
+│       ├── logout.ts
 │       └── refresh-token.ts
+│
 ├── infrastructure/
-│   ├── config/        # Configuração
-│   ├── crypto/        # Criptografia
-│   ├── db/            # Schema Drizzle
-│   ├── logger/        # Logging
-│   └── repositories/  # Implementações
-└── plugins/            # Plugins Fastify
+│   ├── config/           # Configuração da aplicação
+│   ├── crypto/           # Utilitários de criptografia
+│   ├── db/               # Schema e conexão Drizzle
+│   ├── logger/           # Configuração de logging
+│   └── repositories/      # Implementações dos repositórios
+│
+├── plugins/               # Plugins Fastify
+│   ├── dependency-injection.ts
+│   ├── error-handler.ts
+│   ├── health.ts
+│   ├── rate-limit.ts
+│   └── swagger.ts
+│
+├── app.ts                # Configuração principal
+└── server.ts            # Ponto de entrada
 ```
 
-## Discord OAuth Setup
+### Fluxo de Dados
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Controller │ ──▶ │  Use Case  │ ──▶ │ Repository  │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                            │
+                                            ▼
+                                      ┌─────────────┐
+                                      │   Database  │
+                                      └─────────────┘
+```
+
+---
+
+## 🔒 Segurança
+
+- **Tokens criptografados**: Tokens Discord armazenados com AES-256-GCM
+- **Cookies seguros**: HTTP-only, SameSite=Lax, Secure em produção
+- **Validação de input**: Schema validation com Zod
+- **Rate limiting**: Proteção contra ataques de força bruta
+- **Headers de segurança**: Helmet.js configurado
+
+---
+
+## 🔧 Desenvolvimento
+
+### Setup Discord OAuth
 
 1. Acesse [Discord Developer Portal](https://discord.com/developers/applications)
 2. Crie uma nova aplicação
-3. Em OAuth2, adicione redirect URI: `http://localhost:3000/api/v1/auth/discord/callback`
-4. Copie Client ID e Client Secret para o `.env`
+3. Na seção **OAuth2**:
+   - Adicione redirect URI: `http://localhost:3000/api/v1/auth/discord/callback`
+   - Copie o **Client ID**
+   - Gere e copie o **Client Secret**
+4. Configure as variáveis no `.env`
+
+### Boas Práticas
+
+- Commits atômicos e descritivos
+- Testes unitários para lógica de negócio
+- Reviews antes de merge
+- Documentação atualizada
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+<div align="center">
+
+Feito com ❤️
+
+</div>
