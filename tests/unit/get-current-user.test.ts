@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getCurrentUser } from '../get-current-user';
+import { getCurrentUser } from '../../src/features/auth/get-current-user';
 
 describe('getCurrentUser', () => {
   beforeEach(() => {
@@ -54,7 +54,7 @@ describe('getCurrentUser', () => {
           getByDiscordId: vi.fn().mockResolvedValue(mockUser),
         },
       },
-    } as any);
+    } as never);
 
     expect(result.type).toBe('success');
     if (result.type === 'success') {
@@ -81,7 +81,7 @@ describe('getCurrentUser', () => {
           getByDiscordId: vi.fn(),
         },
       },
-    } as any);
+    } as never);
 
     expect(result.type).toBe('not_found');
   });
@@ -109,7 +109,7 @@ describe('getCurrentUser', () => {
           getByDiscordId: vi.fn(),
         },
       },
-    } as any);
+    } as never);
 
     expect(result.type).toBe('expired');
   });

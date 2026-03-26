@@ -4,7 +4,7 @@ beforeAll(() => {
   process.env.ENCRYPTION_KEY = 'test-encryption-key-32-characters!';
 });
 
-const { encrypt, decrypt } = await import('../index');
+const { encrypt, decrypt } = await import('../../src/infrastructure/crypto/index');
 
 describe('crypto', () => {
   describe('encrypt and decrypt', () => {
@@ -33,9 +33,9 @@ describe('crypto', () => {
       const parts = encrypted.split(':');
 
       expect(parts).toHaveLength(3);
-      expect(parts[0]).toHaveLength(32); // IV hex (16 bytes)
-      expect(parts[1]).toHaveLength(32); // Auth tag hex (16 bytes)
-      expect(parts[2].length).toBeGreaterThan(0); // Ciphertext
+      expect(parts[0]).toHaveLength(32);
+      expect(parts[1]).toHaveLength(32);
+      expect(parts[2].length).toBeGreaterThan(0);
     });
 
     it('should throw error for invalid encrypted text format', () => {

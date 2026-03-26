@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { logout } from '../logout';
+import { logout } from '../../src/features/auth/logout';
 
 describe('logout', () => {
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('logout', () => {
           deleteByUserId: vi.fn(),
         },
       },
-    } as any);
+    } as never);
 
     expect(result.type).toBe('success');
     expect(deleteById).toHaveBeenCalledWith('test-session-id');

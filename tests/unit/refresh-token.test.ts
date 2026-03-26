@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { refreshToken } from '../refresh-token';
+import { refreshToken } from '../../src/features/auth/refresh-token';
 
 describe('refreshToken', () => {
   beforeEach(() => {
@@ -51,7 +51,7 @@ describe('refreshToken', () => {
           getByDiscordId: vi.fn(),
         },
       },
-    } as any);
+    } as never);
 
     expect(result.type).toBe('not_found');
   });
@@ -80,7 +80,7 @@ describe('refreshToken', () => {
           getByDiscordId: vi.fn(),
         },
       },
-    } as any);
+    } as never);
 
     expect(result.type).toBe('not_found');
   });

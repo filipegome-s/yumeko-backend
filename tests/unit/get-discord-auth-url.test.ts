@@ -1,6 +1,5 @@
-import type { Logger } from 'pino';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getDiscordAuthUrl } from '../get-discord-auth-url';
+import { describe, expect, it } from 'vitest';
+import { getDiscordAuthUrl } from '../../src/features/auth/get-discord-auth-url';
 
 describe('getDiscordAuthUrl', () => {
   it('should return a valid Discord OAuth URL', async () => {
@@ -21,7 +20,7 @@ describe('getDiscordAuthUrl', () => {
           },
           sessionSecret: 'test-secret',
         },
-        logger: {} as Logger,
+        logger: {} as never,
         repositories: {} as never,
       },
     );

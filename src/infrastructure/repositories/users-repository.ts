@@ -8,11 +8,11 @@ export function makeUsersRepository(db: Database): UsersRepository {
   return {
     async upsert(user) {
       try {
-        const existing = await db.query.users.findFirst({
+        const userData = await db.query.users.findFirst({
           where: eq(users.discordId, user.discordId),
         });
 
-        if (existing) {
+        if (userData) {
           await db
             .update(users)
             .set({
@@ -23,7 +23,7 @@ export function makeUsersRepository(db: Database): UsersRepository {
             })
             .where(eq(users.discordId, user.discordId));
 
-          return { ok: true, data: toEntity({ ...existing, ...user }) };
+          return { ok: true, data: toEntity({ ...userData, ...user }) };
         }
 
         await db.insert(users).values({
