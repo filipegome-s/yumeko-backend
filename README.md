@@ -236,10 +236,6 @@ Readiness probe - verifica conexão com banco.
 
 ## 🏗️ Arquitetura
 
-### Diagrama de Arquitetura
-
-![Arquitetura](./image/flux.png)
-
 ### Estrutura de Pastas
 
 ```
@@ -282,16 +278,7 @@ src/
 
 ### Fluxo de Dados
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  Controller │ ──▶ │  Use Case  │ ──▶ │ Repository  │
-└─────────────┘     └─────────────┘     └─────────────┘
-                                            │
-                                            ▼
-                                      ┌─────────────┐
-                                      │   Database  │
-                                      └─────────────┘
-```
+![Fluxo de Dados](./image/flux.png)
 
 ---
 
